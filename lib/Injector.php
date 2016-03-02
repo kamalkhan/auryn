@@ -2,7 +2,9 @@
 
 namespace Auryn;
 
-class Injector
+use Interop\Container\ContainerInterface;
+
+class Injector implements ContainerInterface
 {
     const A_RAW = ':';
     const A_DELEGATE = '+';
@@ -56,6 +58,32 @@ class Injector
     public function __clone()
     {
         $this->inProgressMakes = array();
+    }
+
+    /**
+    * Alias of make.
+    * Required for ContainerInterface.
+    * @todo Throw Interop\Container\Exception\ContainerException
+    * @todo Interop\Container\Exception\NotFoundException
+    * @param string $name
+    * @param array $args
+    * @return mixed
+    */
+    public function get($name, array $args = array())
+    {
+        return $this->make($name, $args);
+    }
+
+    /**
+    * Check if binding exists.
+    * Required for ContainerInterface.
+    * @param string $name
+    * @return bool
+    */
+    public function has($name)
+    {
+        $inspections = $this->inspect($name, self::I_BINDINGS);
+        return !!array_shift($inspections);
     }
 
     /**
